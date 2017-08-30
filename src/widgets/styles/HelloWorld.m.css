@@ -1,0 +1,19 @@
+.hello {
+	background-color: rgba(159, 181, 203, 0.30);
+	border: 1px solid gray;
+	border-radius: 4px;
+	display: block;
+	font-family: -apple-system, BlinkMacSystemFont;
+	margin: 1em;
+	padding: 1em;
+	user-select: none;
+	width: 200px;
+}
+
+.hello span {
+	display: inline-block;
+}
+
+.upsidedown {
+	color: red;
+}
