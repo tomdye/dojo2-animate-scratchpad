@@ -15,38 +15,65 @@ export const HelloWorldBase = AnimatedMixin(ThemeableMixin(WidgetBase));
 
 @theme(css)
 export default class HelloWorld extends HelloWorldBase<HelloWorldProperties> {
-	private _rotated = false;
+	private _play = false;
+	private _speed = 1;
 
-	private onClick(): void {
-		// this.properties.toggleStranger && this.properties.toggleStranger();
-		this._rotated = !this._rotated;
+	private togglePlay(): void {
+		this._play = !this._play;
 		this.invalidate();
 	}
 
-	protected render(): DNode {
+	private increaseSpeed(): void {
+		if (this._speed < 5) {
+			this._speed += 1;
+		} else {
+			this._speed = 1;
+		}
+
+		this.invalidate();
+	}
+
+	private _onPlayFinish(): void {
+		this._play = false;
+		this.invalidate();
+	}
+
+	protected render() {
 		const classes = this.classes(
 			css.hello,
 			this.properties.stranger ? css.upsidedown : null
 		);
 
-		return v('div', {
-			classes,
-			onclick: this.onClick,
-			key: 'root',
-			animate: [{
-				id: 'strange',
-				effects: [
-					{ transform: 'rotate(0deg)' },
-					{ transform: 'rotate(180deg)' }
-				],
-				timing: {
-					duration: 200,
-					fill: 'forwards'
-				}
-			}]
-		}, [
-			v('span', [ 'Hello,' ]),
-			v('span', [ 'Dojo World!' ])
-		]);
+		return [
+			v('div', {
+				classes,
+				key: 'root',
+				animate: [{
+					id: 'bob',
+					effects: [
+						{ transform: 'scale(1,1) rotate(0deg)' },
+						{ transform: 'scale(2,2) rotate(180deg)'},
+						{ transform: 'scale(1,1) rotate(360deg)'}
+					],
+					timing: {
+						duration: 1000,
+						iterations: Infinity
+					},
+					controls: {
+						play: this._play,
+						playbackRate: this._speed
+					}
+				}]
+			}, [
+				v('span', [ 'Hello,' ]),
+				v('span', [ 'Dojo World!' ])
+			]),
+			v('button', {
+				onclick: this.togglePlay
+			}, [ 'Play / Pause' ]),
+			v('button', {
+				onclick: this.increaseSpeed
+			}, [ 'Increase Speed' ])
+		];
 	}
 }
