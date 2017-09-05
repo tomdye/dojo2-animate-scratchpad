@@ -1,6 +1,6 @@
 import 'web-animations-js/web-animations-next-lite.min';
 import { ClassesFunction, Constructor, DNode, HNode, WidgetProperties, WidgetMetaProperties } from '@dojo/widget-core/interfaces';
-import { WidgetBase, beforeRender } from '@dojo/widget-core/WidgetBase';
+import { WidgetBase, afterRender } from '@dojo/widget-core/WidgetBase';
 import { isHNode, decorate } from '@dojo/widget-core/d';
 import Map from '@dojo/shim/Map';
 import MetaBase from '@dojo/widget-core/meta/Base';
@@ -48,9 +48,11 @@ class AnimationPlayer extends MetaBase {
 			id
 		} = properties;
 
+		const fx = typeof effects === 'function' ? effects() : effects;
+
 		const keyframeEffect = new KeyframeEffect(
 			node,
-			effects,
+			fx,
 			timing
 		);
 
@@ -111,34 +113,37 @@ class AnimationPlayer extends MetaBase {
 
 	add(key: string, animateProperties: AnimationProperties[]): Promise<any> {
 		return new Promise((resolve) => {
-			this.requireNode(key, function(this: AnimationPlayer, node: HTMLElement) {
+			requestAnimationFrame(() => {
+				this.requireNode(key, function(this: AnimationPlayer, node: HTMLElement) {
 
-				animateProperties.forEach((properties) => {
-					properties = typeof properties === 'function' ? properties() : properties;
+					animateProperties.forEach((properties) => {
+						properties = typeof properties === 'function' ? properties() : properties;
 
-					if (properties) {
-						const { id } = properties;
-						if (!this._animationMap.has(id)) {
+						if (properties) {
+							const { id } = properties;
+							if (!this._animationMap.has(id)) {
+								this._animationMap.set(id, {
+									player: this._createPlayer(node, properties),
+									used: true
+								});
+							}
+
+							const { player } = this._animationMap.get(id);
+							const { controls = {} } = properties;
+
+							this._updatePlayer(player, controls);
+
 							this._animationMap.set(id, {
-								player: this._createPlayer(node, properties),
+								player,
 								used: true
 							});
 						}
+					});
 
-						const { player } = this._animationMap.get(id);
-						const { controls = {} } = properties;
+					resolve();
 
-						this._updatePlayer(player, controls);
-
-						this._animationMap.set(id, {
-							player,
-							used: true
-						});
-					}
-				});
-
-				resolve();
-			}.bind(this));
+				}.bind(this));
+			});
 		});
 	}
 
@@ -157,9 +162,8 @@ class AnimationPlayer extends MetaBase {
 export function AnimatedMixin<T extends Constructor<WidgetBase>>(Base: T): T {
 	class Animated extends Base {
 
-		@beforeRender()
-		protected beforeWidgetRender(renderFunc: () => DNode, properties: any, children: DNode[]): () => any {
-			const result = renderFunc();
+		@afterRender()
+		myAfterRender(result: DNode): DNode {
 			const promises: Promise<any>[] = [];
 			decorate(result,
 				(node: HNode) => {
@@ -171,7 +175,7 @@ export function AnimatedMixin<T extends Constructor<WidgetBase>>(Base: T): T {
 				}
 			);
 			Promise.all(promises).then(() => this.meta(AnimationPlayer).clearAnimations());
-			return () => result;
+			return result;
 		}
 	}
 

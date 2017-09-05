@@ -1,0 +1,23 @@
+.root {
+	/* width: 300px; */
+	border: 1px solid black;
+}
+
+.title {
+	height: 32px;
+	background: blue;
+	color: white;
+	padding: 5px;
+	box-sizing: border-box;
+}
+
+.content {
+	background: white;
+	color: black;
+	overflow: hidden;
+	height: 0;
+}
+
+.wrapper {
+	width: 200px;
+}

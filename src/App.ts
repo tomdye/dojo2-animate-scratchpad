@@ -1,21 +1,13 @@
-import { w } from '@dojo/widget-core/d';
-import { DNode, WidgetProperties } from '@dojo/widget-core/interfaces';
+import { w, v } from '@dojo/widget-core/d';
 import { WidgetBase } from '@dojo/widget-core/WidgetBase';
 
-import HelloWorld, { HelloWorldProperties } from './widgets/HelloWorld';
+// import HelloWorld, { HelloWorldProperties } from './widgets/HelloWorld';
+import TitlePane from './widgets/TitlePane';
+import * as css from './widgets/styles/titlePane.m.css';
 
-export default class App extends WidgetBase<WidgetProperties> {
+export default class App extends WidgetBase {
 
-	private stranger = true;
-
-	private toggleStranger(): void {
-		this.stranger = !this.stranger;
-		this.invalidate();
-	}
-
-	protected render(): DNode {
-		const { stranger, toggleStranger } = this;
-
-		return w<HelloWorld>(HelloWorld, { stranger, toggleStranger });
+	protected render() {
+		return v('div', { classes: { [css.wrapper]: true } }, [ w(TitlePane, {}) ]);
 	}
 }
