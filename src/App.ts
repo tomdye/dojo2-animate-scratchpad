@@ -8,6 +8,6 @@ import * as css from './widgets/styles/titlePane.m.css';
 export default class App extends WidgetBase {
 
 	protected render() {
-		return v('div', { classes: { [css.wrapper]: true } }, [ w(TitlePane, {}) ]);
+		return v('div', { classes: { [css.wrapper]: true } }, [ w(TitlePane, {}), w(TitlePane, {}), w(TitlePane, {}) ]);
 	}
 }

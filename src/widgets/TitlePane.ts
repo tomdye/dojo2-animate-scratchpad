@@ -3,14 +3,14 @@ import { DNode, WidgetProperties } from '@dojo/widget-core/interfaces';
 import { ThemeableMixin, theme } from '@dojo/widget-core/mixins/Themeable';
 import { WidgetBase } from '@dojo/widget-core/WidgetBase';
 import Dimensions from '@dojo/widget-core/meta/Dimensions';
-import AnimatedMixin from '../mixins/Animated';
+import AnimatableMixin from '@dojo/widget-core/mixins/Animatable';
 
 import * as css from './styles/titlePane.m.css';
 
 export interface TitlePaneProperties extends WidgetProperties {
 }
 
-export const TitlePaneBase = AnimatedMixin(ThemeableMixin(WidgetBase));
+export const TitlePaneBase = AnimatableMixin(ThemeableMixin(WidgetBase));
 
 @theme(css)
 export default class TitlePane extends TitlePaneBase<TitlePaneProperties> {
@@ -23,7 +23,7 @@ export default class TitlePane extends TitlePaneBase<TitlePaneProperties> {
 
 	_animateOpen() {
 		const { size, scroll } = this.meta(Dimensions).get('content');
-		const dim = this.meta(Dimensions).get('content');
+		console.log(`size: ${size.height}, scroll: ${scroll.height}`);
 
 		return [
 			{ height: `${size.height}px` },
@@ -46,6 +46,8 @@ export default class TitlePane extends TitlePaneBase<TitlePaneProperties> {
 			fill: 'forwards',
 			easing: 'ease-in-out'
 		};
+
+		console.log('render called');
 
 		return v('div', {
 				classes: this.classes(css.root),
